@@ -23,10 +23,16 @@ def solve_psne_2(payoff_matrix_p1, payoff_matrix_p2):
 def solve_msne_2(payoff_matrix_p1, payoff_matrix_p2, granularity=5):
   # Construct list of probability values
   probability_range = linspace(0.0, 1.0, granularity).tolist()
-  probability_vectors = [[p*q, p*(1-q), (1-p)*q, (1-p)*(1-q)] for p in probability_range for q in probability_range]
-  payoff_vector = list(chain.from_iterable(payoff_matrix_p2))
-  utilities = [sum(list(map(lambda x, y: x*y, p, payoff_vector))) for p in probability_vectors]
-  print(utilities)
+  probability_vectors = {(p,q): [p*q, p*(1-q), (1-p)*q, (1-p)*(1-q)] for p in probability_range for q in probability_range}
+  payoff_vector_1 = list(chain.from_iterable(payoff_matrix_p1))
+  payoff_vector_2 = list(chain.from_iterable(payoff_matrix_p2))
+  utilities_1 = {pair: sum(list(map(lambda x, y: x*y, probability_vectors[pair], payoff_vector_1))) for pair in probability_vectors}
+  utilities_2 = {pair: sum(list(map(lambda x, y: x*y, probability_vectors[pair], payoff_vector_2))) for pair in probability_vectors}
+  # print(utilities_1)
+  # print(utilities_2)
+  matched = list(map(lambda x, y: (x[0], abs(x[1] - y[1])), sorted(utilities_1.items()), sorted(utilities_2.items())))
+  minimum = min(matched, key=lambda x: x[1])
+  print([x for x in matched if x[1] == minimum[1]])
   return None
 
 def test(condition):
