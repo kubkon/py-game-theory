@@ -1,4 +1,5 @@
-from numpy import array
+from numpy import array, linspace
+from itertools import chain
 
 def transpose(payoff_matrix):
   return array(payoff_matrix).transpose().tolist()
@@ -18,6 +19,15 @@ def solve_psne_2(payoff_matrix_p1, payoff_matrix_p2):
   matched_responses = list(map(lambda x, y: x == y, indices_p1, indices_p2))
   psne = [indices for indices in indices_p1 if matched_responses[indices_p1.index(indices)] == True]
   return psne
+
+def solve_msne_2(payoff_matrix_p1, payoff_matrix_p2, granularity=5):
+  # Construct list of probability values
+  probability_range = linspace(0.0, 1.0, granularity).tolist()
+  probability_vectors = [[p*q, p*(1-q), (1-p)*q, (1-p)*(1-q)] for p in probability_range for q in probability_range]
+  payoff_vector = list(chain.from_iterable(payoff_matrix_p2))
+  utilities = [sum(list(map(lambda x, y: x*y, p, payoff_vector))) for p in probability_vectors]
+  print(utilities)
+  return None
 
 def test(condition):
   try:
@@ -42,6 +52,8 @@ if __name__ == '__main__':
   # Solve for PSNE
   psne = solve_psne_2(p_matrix_p1, p_matrix_p2)
   test(psne == [])
+  # Solve for MSNE
+  msne = solve_msne_2(p_matrix_p1, p_matrix_p2)
   ### Test scenario3: Example 4.16 from Carter's book
   # Create payoff matrices for two players
   p_matrix_p1 = [[1, 4, 2], [4, 0, 4], [2, 3, 5]]
