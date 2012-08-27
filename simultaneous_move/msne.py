@@ -76,5 +76,5 @@ if __name__ == '__main__':
   p_matrix_p1 = [[0, -1, 1], [1, 0, -1], [-1, 1, 0]]
   p_matrix_p2 = [[0, 1, -1], [-1, 0, 1], [1, -1, 0]]
   # Solve for MSNE
-  msne = solve_msne_2(p_matrix_p1, p_matrix_p2, granularity=10)
+  msne = solve_msne_2(p_matrix_p1, p_matrix_p2, granularity=7)
   print(msne)

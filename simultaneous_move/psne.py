@@ -1,12 +1,19 @@
 from numpy import array, linspace
-from itertools import chain
 
 def transpose(payoff_matrix):
   return array(payoff_matrix).transpose().tolist()
 
 def get_best_responses(payoff_matrix):
   # Select argmax from each row, and return the result as a list
-  return list(map(lambda x: (payoff_matrix.index(x), x.index(max(x))), payoff_matrix))
+  best_responses = []
+  for row in payoff_matrix:
+    count = 0
+    for el in row:
+      maximum = max(row)
+      if el == maximum:
+        best_responses += [(payoff_matrix.index(row), count)]
+      count += 1
+  return best_responses
 
 def solve_psne_2(payoff_matrix_p1, payoff_matrix_p2):
   # Transpose payoff matrix for player 1, and get best responses
@@ -16,8 +23,11 @@ def solve_psne_2(payoff_matrix_p1, payoff_matrix_p2):
   # Get best responses for player 2
   indices_p2 = get_best_responses(payoff_matrix_p2)
   # Return PSNE (if exist)
-  matched_responses = list(map(lambda x, y: x == y, indices_p1, indices_p2))
-  psne = [indices for indices in indices_p1 if matched_responses[indices_p1.index(indices)] == True]
+  psne = []
+  if len(indices_p1) >= len(indices_p2):
+    psne = [el for el in indices_p1 if el in indices_p2]
+  else:
+    psne = [el for el in indices_p2 if el in indices_p1]
   return psne
 
 def test(condition):
@@ -35,7 +45,7 @@ if __name__ == '__main__':
   p_matrix_p2 = [[-1, 0], [-10, -3]]
   # Solve for PSNE
   psne = solve_psne_2(p_matrix_p1, p_matrix_p2)
-  test(psne == [(1, 1)])
+  test(set(psne) == set(((1, 1),)))
   ### Test scenario2: Matching pennies
   # Create payoff matrices for two players
   p_matrix_p1 = [[-1, 1], [1, -1]]
@@ -45,8 +55,15 @@ if __name__ == '__main__':
   test(psne == [])
   ### Test scenario3: Example 4.16 from Carter's book
   # Create payoff matrices for two players
-  p_matrix_p1 = [[1, 4, 2], [4, 0, 4]]#, [2, 3, 5]]
-  p_matrix_p2 = [[3, 2, 2], [0, 3, 1]]#, [5, 4, 6]]
+  p_matrix_p1 = [[1, 4, 2], [4, 0, 4], [2, 3, 5]]
+  p_matrix_p2 = [[3, 2, 2], [0, 3, 1], [5, 4, 6]]
   # Solve for PSNE
   psne = solve_psne_2(p_matrix_p1, p_matrix_p2)
-  test(psne == [(2, 2)])
+  test(set(psne) == set(((2, 2),)))
+  ### Test scenario4: Exercise 4.3 from Carter's book
+  # Create payoff matrices for two players
+  p_matrix_p1 = [[10, 5, 4], [10, 5, 1]]
+  p_matrix_p2 = [[0, 1, -2], [1, 0, -1]]
+  # Solve for PSNE
+  psne = solve_psne_2(p_matrix_p1, p_matrix_p2)
+  test(set(psne) == set(((1, 0), (0, 1))))
