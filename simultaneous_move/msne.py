@@ -16,7 +16,7 @@ def multiply_probability_vectors(vector_1, vector_2):
   return tuple(v1*v2 for v1 in vector_1 for v2 in vector_2)
 
 def find_msne(intersections, length, player):
-  msne = None
+  result = None
   for pair in intersections:
     msne = pair[player]
     msne_list = []
@@ -24,10 +24,11 @@ def find_msne(intersections, length, player):
       if pair[player] == msne:
         msne_list += [pair[(player + 1) % 2]]
     if len(msne_list) == length:
+      result = msne
       break
-  return msne
+  return result
 
-def solve_msne_2(payoff_matrix_p1, payoff_matrix_p2, granularity=5):
+def solve_msne_2(payoff_matrix_p1, payoff_matrix_p2, granularity=5, error=.05):
   # Construct list of probability values
   probability_range = linspace(0.0, 1.0, granularity).tolist()
   # Construct probability vectors for each bidder
@@ -41,8 +42,8 @@ def solve_msne_2(payoff_matrix_p1, payoff_matrix_p2, granularity=5):
   utilities_p2 = {pair: sum(list(map(lambda x,y: x*y, probability_vectors[pair], payoff_vector_p2))) for pair in probability_vectors}
   intersections = {pair: abs(utilities_p1[pair] - utilities_p2[pair]) for pair in probability_vectors}
   minimum = min(intersections.values())
-  intersections = {pair: intersections[pair] for pair in intersections if intersections[pair] == minimum}
-  msne = (find_msne(intersections, len(probability_range), 0), find_msne(intersections, len(probability_range), 1))
+  intersections = {pair: intersections[pair] for pair in intersections if abs(intersections[pair] - minimum) <= error}
+  msne = (find_msne(intersections, len(vector_p1), 0), find_msne(intersections, len(vector_p2), 1))
   return msne
 
 def test(condition):
@@ -70,9 +71,10 @@ if __name__ == '__main__':
   # Solve for MSNE
   msne = solve_msne_2(p_matrix_p1, p_matrix_p2)
   test(((.5, .5), (.5, .5)) == msne)
-  ### Test scenario2: Example 4.16 from Carter's book
+  ### Test scenario2: Rock-paper-scissors
   # Create payoff matrices for two players
-  p_matrix_p1 = [[1, 4, 2], [4, 0, 4]]#, [2, 3, 5]]
-  p_matrix_p2 = [[3, 2, 2], [0, 3, 1]]#, [5, 4, 6]]
+  p_matrix_p1 = [[0, -1, 1], [1, 0, -1], [-1, 1, 0]]
+  p_matrix_p2 = [[0, 1, -1], [-1, 0, 1], [1, -1, 0]]
   # Solve for MSNE
-  # msne = solve_msne_2(p_matrix_p1, p_matrix_p2)
+  msne = solve_msne_2(p_matrix_p1, p_matrix_p2, granularity=10)
+  print(msne)
