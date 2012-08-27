@@ -26,5 +26,10 @@ if __name__ == '__main__':
   ttk.Label(mainframe, text="rows").grid(column=2, row=1, sticky=W)
   ttk.Label(mainframe, text="columns").grid(column=2, row=2, sticky=W)
   
+  for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
+  
+  row_entry.focus()
+  root.bind('<Return>', create_form)
+  
   root.mainloop()
   
