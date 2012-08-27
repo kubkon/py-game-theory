@@ -53,14 +53,14 @@ if __name__ == '__main__':
   # Solve for PSNE
   psne = solve_psne_2(p_matrix_p1, p_matrix_p2)
   test(psne == [])
-  ### Test scenario3: Example 4.16 from Carter's book
+  ### Test scenario3: Example 4.16 from Webb's book
   # Create payoff matrices for two players
   p_matrix_p1 = [[1, 4, 2], [4, 0, 4], [2, 3, 5]]
   p_matrix_p2 = [[3, 2, 2], [0, 3, 1], [5, 4, 6]]
   # Solve for PSNE
   psne = solve_psne_2(p_matrix_p1, p_matrix_p2)
   test(set(psne) == set(((2, 2),)))
-  ### Test scenario4: Exercise 4.3 from Carter's book
+  ### Test scenario4: Exercise 4.3 from Webb's book
   # Create payoff matrices for two players
   p_matrix_p1 = [[10, 5, 4], [10, 5, 1]]
   p_matrix_p2 = [[0, 1, -2], [1, 0, -1]]
