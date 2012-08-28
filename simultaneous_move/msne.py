@@ -1,4 +1,5 @@
 from itertools import chain
+from test import test
 
 def linspace(begin, end, granularity):
   return map(lambda x: x/granularity, range(begin * granularity, end * granularity + 1))
@@ -52,14 +53,6 @@ def solve_msne_2(payoff_matrix_p1, payoff_matrix_p2, granularity=4, error=.01):
   # Find MSNE (if exist)
   msne = find_msne(vector_p1, utilities_p1, vector_p2, utilities_p2, error)
   return msne
-
-def test(condition):
-  try:
-    assert condition
-  except AssertionError as e:
-    print("Test failed")
-  else:
-    print("Test successful")
 
 if __name__ == '__main__':
   ### Test get_probability_vectors(...)

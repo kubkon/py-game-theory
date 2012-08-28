@@ -1,4 +1,5 @@
 from numpy import array, linspace
+from test import test
 
 def transpose(payoff_matrix):
   return array(payoff_matrix).transpose().tolist()
@@ -29,14 +30,6 @@ def solve_psne_2(payoff_matrix_p1, payoff_matrix_p2):
   else:
     psne = [el for el in indices_p2 if el in indices_p1]
   return psne
-
-def test(condition):
-  try:
-    assert condition
-  except AssertionError as e:
-    print("Test failed")
-  else:
-    print("Test successful")
 
 if __name__ == '__main__':
   ### Test scenario1: Prisoner's dilemma
