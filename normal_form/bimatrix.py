@@ -2,15 +2,23 @@ from itertools import combinations
 import numpy as np
 
 def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
-  r"""Implements support enumeration algorithm for computing all Nash equilibria of a bimatrix game specified by the input payoff matrices per player, and returns a list consisting of all Nash equilibria of the game. Each element of the returned list is a tuple of mixed strategies for both players, with the first element being the mixed strategy of the first player.
+  r"""Implements support enumeration algorithm for computing all Nash
+  equilibria of a bimatrix game specified by the input payoff matrices per
+  player, and returns a list consisting of all Nash equilibria of the game.
+  Each element of the returned list is a tuple of mixed strategies for both
+  players, with the first element being the mixed strategy of the first
+  player.
   
-  Full theoretical description of the algorithm can be found in \"Algorithmic Game Theory\" by Nisan et al. (see Algorithm 3.4).
+  Full theoretical description of the algorithm can be found in
+  \"Algorithmic Game Theory\" by Nisan et al. (see Algorithm 3.4).
   
   IMPORTANT: The algorithm requires the game to be _nondegenerate_.
   
   Keyword arguments:
-  payoff_matrix_p1 -- Payoff matrix of player 1 (np.array functionality required)
-  payoff_matrix_p2 -- Payoff matrix of player 2 (np.array functionality required)
+  payoff_matrix_p1 -- Payoff matrix of player 1 (np.array functionality
+  required)
+  payoff_matrix_p2 -- Payoff matrix of player 2 (np.array functionality
+  required)
   """
   # Input params
   m, n = payoff_matrix_p1.shape
@@ -20,11 +28,12 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   msne = []
   # 1. Find set K={1,...,min{m,n}}
   K = set(range(1, min((m, n)) + 1))
-  # 2. For each k in K
+  # 2. For each k in K,
   for k in K:
-    # Let M(k) and N(k) be sets of all k-sized subsets of M and N, respectively
-    # 3. For each pair (I, J) such that I in M(k) and J in N(k)
-    for (I, J) in [(I, J) for I in set(combinations(M, k)) for J in set(combinations(N, k))]:
+    # 3. Let M(k) and N(k) be sets of all k-sized subsets of M and N,
+    # respectively. For each pair (I, J) such that I in M(k) and J in N(k),
+    for (I, J) in [(I, J) for I in set(combinations(M, k)) \
+                          for J in set(combinations(N, k))]:
       # 4. Solve for mixed strategy vectors x and y
       x = np.zeros((m, 1))
       y = np.zeros((n, 1))
@@ -46,7 +55,8 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         # Create mixed strategy vector x
         solution.resize(m)
         indices = list(I)
-        if len(indices) < m: indices += [p for p in range(m) if p not in indices]
+        if len(indices) < m:
+          indices += [p for p in range(m) if p not in indices]
         for (i,j) in list(map(lambda i,j: (i,j), indices, range(m))):
           x[i] = solution[j]
         # For player 2
@@ -62,7 +72,8 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         # Create mixed strategy vector y
         solution.resize(n)
         indices = list(J)
-        if len(indices) < n: indices += [p for p in range(n) if p not in indices]
+        if len(indices) < n:
+          indices += [p for p in range(n) if p not in indices]
         for (i,j) in list(map(lambda i,j: (i,j), indices, range(n))):
           y[i] = solution[j]
       # Verify that (x, y) constitutes a Nash equilibrium
@@ -71,13 +82,17 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         # 6. Check if best response condition is met
         # For x
         v = [np.dot(x.flatten(), payoff_matrix_p2[:,j]) for j in J]
-        maximum_x = max([np.dot(x.flatten(), payoff_matrix_p2[:,n]) for n in N])
+        maximum_x = max([np.dot(x.flatten(), \
+                         payoff_matrix_p2[:,n]) for n in N])
         # For y
         u = [np.dot(y.flatten(), payoff_matrix_p1[i,:]) for i in I]
-        maximum_y = max([np.dot(y.flatten(), payoff_matrix_p1[m,:]) for m in M])
+        maximum_y = max([np.dot(y.flatten(), \
+                         payoff_matrix_p1[m,:]) for m in M])
         # Account for numerical errors from dot product operation on floats
-        if list(map(lambda el: abs(el - maximum_x) <= .0000001, v)).count(True) == len(v) and \
-           list(map(lambda el: abs(el - maximum_y) <= .0000001, u)).count(True) == len(u):
+        if list(map(lambda el: abs(el - maximum_x) <= .0000001,  v)) \
+               .count(True) == len(v) and \
+           list(map(lambda el: abs(el - maximum_y) <= .0000001, u)) \
+               .count(True) == len(u):
           # If the last condition is met, add (x, y) to solution list msne
           msne += [(x, y)]
   return msne
