@@ -9,10 +9,9 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   IMPORTANT: The algorithm requires the game to be _nondegenerate_.
   
   Keyword arguments:
-  payoff_matrix_p1 -- Payoff matrix of player 1
-  payoff_matrix_p2 -- Payoff matrix of player 2
+  payoff_matrix_p1 -- Payoff matrix of player 1 (np.array functionality required)
+  payoff_matrix_p2 -- Payoff matrix of player 2 (np.array functionality required)
   """
-  # Assumes matrices are nondegenerate!
   # Input params
   m, n = payoff_matrix_p1.shape
   M = set(range(m))
@@ -23,15 +22,10 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   K = set(range(1, min((m, n)) + 1))
   # 2. For each k in K
   for k in K:
-    # 3. Find all k-sized subsets of M and N
-    M_k, N_k = set(combinations(M, k)), set(combinations(N, k))
-    # 4. Find set of all possible pairs (I, J) such that I in M_k, and J in N_k
-    I_J_pairs = [(I, J) for I in M_k for J in N_k]
-    # 5. For each I_J pair in I_J_pairs
-    for I_J in I_J_pairs:
-      # 6. Solve for mixed strategy vectors x and y
-      I = I_J[0]
-      J = I_J[1]
+    # Let M(k) and N(k) be sets of all k-sized subsets of M and N, respectively
+    # 3. For each pair (I, J) such that I in M(k) and J in N(k)
+    for (I, J) in [(I, J) for I in set(combinations(M, k)) for J in set(combinations(N, k))]:
+      # 4. Solve for mixed strategy vectors x and y
       x = np.zeros((m, 1))
       y = np.zeros((n, 1))
       if k == 1:
@@ -72,9 +66,9 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         for (i,j) in list(map(lambda i,j: (i,j), indices, range(n))):
           y[i] = solution[j]
       # Verify that (x, y) constitutes a Nash equilibrium
-      # 7. Check if both x and y are nonnegative
+      # 5. Check if both x and y are nonnegative
       if (x >= 0).all() and (y >= 0).all():
-        # 8. Check if best response condition is met
+        # 6. Check if best response condition is met
         # For x
         v = [np.dot(x.flatten(), payoff_matrix_p2[:,j]) for j in J]
         maximum_x = max([np.dot(x.flatten(), payoff_matrix_p2[:,n]) for n in N])
@@ -89,13 +83,13 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   return msne
 
 if __name__ == '__main__':
-  ### Test scenario1: Example 3.3 Nisan et al. book
+  ### Test scenario1: Equation 3.3 Nisan et al. book
   # Payoff matrices
   payoff_matrix_p1 = np.array([[3, 3], [2, 5], [0, 6]])
   payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  print("MSNE for Example 3.3 game:")
+  print("MSNE for Equation 3.3 game:")
   for ne in msne:
     print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
   print()
@@ -126,6 +120,16 @@ if __name__ == '__main__':
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
   print("MSNE for Rock-Paper-Scissors game:")
+  for ne in msne:
+    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
+  print()
+  ### Test scenario5: Equation 3.7 Nisan et al. book
+  # Payoff matrices
+  payoff_matrix_p1 = np.array([[3, 3, 0], [4, 0, 1], [0, 4, 5]])
+  payoff_matrix_p2 = payoff_matrix_p1.transpose()
+  # Find MSNE using support enumeration algorithm
+  msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
+  print("MSNE for Equation 3.7 game:")
   for ne in msne:
     print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
   print()
