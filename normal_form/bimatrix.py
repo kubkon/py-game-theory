@@ -2,6 +2,16 @@ from itertools import combinations
 import numpy as np
 
 def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
+  r"""Implements support enumeration algorithm for computing all Nash equilibria of a bimatrix game specified by the input payoff matrices per player, and returns a list consisting of all Nash equilibria of the game. Each element of the returned list is a tuple of mixed strategies for both players, with the first element being the mixed strategy of the first player.
+  
+  Full theoretical description of the algorithm can be found in \"Algorithmic Game Theory\" by Nisan et al. (see Algorithm 3.4).
+  
+  IMPORTANT: The algorithm requires the game to be _nondegenerate_.
+  
+  Keyword arguments:
+  payoff_matrix_p1 -- Payoff matrix of player 1
+  payoff_matrix_p2 -- Payoff matrix of player 2
+  """
   # Assumes matrices are nondegenerate!
   # Input params
   m, n = payoff_matrix_p1.shape
