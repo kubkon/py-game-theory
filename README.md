@@ -10,4 +10,4 @@ Required modules:
 + [NumPy](http://numpy.scipy.org/)
 
 # License
-License information can be found in [LICENSE.md](LICENSE.md).
+License information can be found in [LICENSE.md](/LICENSE.md).
