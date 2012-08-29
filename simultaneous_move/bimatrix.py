@@ -9,7 +9,7 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   M = set(range(m))
   N = set(range(n))
   # Output params
-  solutions = []
+  msne = []
   # 1. Find set K={1,...,min{m,n}}
   K = set(range(1, min((m, n)) + 1))
   # 2. For each k in K
@@ -34,7 +34,10 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         v = [np.array([payoff_matrix_p2[i, j] for i in I]) for j in J]
         A = np.array([v[0]-v[p] for p in range(1, k)] + [np.ones((k, 1))])
         b = np.array((k-1)*[0] + [1])
-        solution = np.linalg.solve(A, b)
+        try:
+          solution = np.linalg.solve(A, b)
+        except np.linalg.linalg.LinAlgError:
+          solution = np.linalg.lstsq(A, b)[0]
         # Create probability vector x
         solution.resize(m)
         I = list(I)
@@ -50,7 +53,10 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         u = [np.array([payoff_matrix_p1[i, j] for j in J]) for i in I]
         A = np.array([u[0]-u[p] for p in range(1, k)] + [np.ones((k, 1))])
         b = np.array((k-1)*[0] + [1])
-        solution = np.linalg.solve(A, b)
+        try:
+          solution = np.linalg.solve(A, b)
+        except np.linalg.linalg.LinAlgError:
+          solution = np.linalg.lstsq(A, b)[0]
         # Create probability vector y
         solution.resize(n)
         J = list(J)
@@ -75,14 +81,14 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         # Account for numerical errors from dot product operation on floats
         if list(map(lambda el: abs(el - maximum_x) <= .0000001, v)).count(True) == len(v) and \
            list(map(lambda el: abs(el - maximum_y) <= .0000001, u)).count(True) == len(u):
-          solutions += [(x, y)]
-  return solutions
+          msne += [(x, y)]
+  return msne
 
 if __name__ == '__main__':
   ### Test scenario1: Example 3.3 Nisan et al. book
   # Payoff matrices
   payoff_matrix_p1 = np.array([[3, 3], [2, 5], [0, 6]])
-  payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])  
+  payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
   print("MSNE for Example 3.3 game:")
@@ -99,3 +105,14 @@ if __name__ == '__main__':
   for ne in msne:
     print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
   print()
+  ### Test scenario3: Example 2.2 Nisan et al. book
+  # Payoff matrices
+  payoff_matrix_p1 = np.array([[0, 3, 0], [0, 0, 3], [2, 2, 2]])
+  payoff_matrix_p2 = payoff_matrix_p1.transpose()
+  # Find MSNE using support enumeration algorithm
+  msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
+  print("MSNE for Example 2.2 game:")
+  for ne in msne:
+    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
+  print()
+  
