@@ -21,12 +21,16 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
       # 6. Solve the equations
       I = I_J[0]
       J = I_J[1]
+      x = np.zeros((m, 1))
+      y = np.zeros((n, 1))
       # For player 1
       v = [np.array([payoff_matrix_p2[i][j] for i in I]) for j in J]
       # For player 2
       u = [np.array([payoff_matrix_p1[i][j] for j in J]) for i in I]
       if k == 1:
-        x, y = None, None
+        # Create probability vectors x and y
+        x[I[0]] = 1
+        y[J[0]] = 1
       else:
         # For player 1
         A = np.array([v[0]-v[p] for p in range(1, k)] + [np.ones((k, 1))])
@@ -39,7 +43,6 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
           for p in range(m):
             if p not in I:
               I += [p]
-        x = np.zeros((m, 1))
         count = 0
         for i in I:
           x[i] = solution[count]
@@ -55,7 +58,6 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
           for p in range(n):
             if p not in J:
               J += [p]
-        y = np.zeros((n, 1))
         count = 0
         for j in J:
           y[j] = solution[count]
