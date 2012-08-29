@@ -21,28 +21,54 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
       # 6. Solve the equations
       I = I_J[0]
       J = I_J[1]
-      print(payoff_matrix_p1[0][0])
-  return None
-
-def lemke_howson(payoff_matrix_p1, payoff_matrix_p2):
-  # FIXME ---
-  # Create symmetric matrices if not symmetric already
-  payoff_matrix = payoff_matrix_p1
-  # Verify that matrix is nondegenerate
-  # Find all vertices of the polytype
-  # ---
-  # Proceed with the algorithm
-  # 1. Fix a strategy: row dimension
-  strategy = payoff_matrix.shape[0]
-  # 2. Start at zeroth vector
-  init_vector = np.zeros((strategy, 1))
-  # 3. Find another vertex
+      # For player 1
+      v = [np.array([payoff_matrix_p2[i][j] for i in I]) for j in J]
+      # For player 2
+      u = [np.array([payoff_matrix_p1[i][j] for j in J]) for i in I]
+      if k == 1:
+        x, y = None, None
+      else:
+        # For player 1
+        A = np.array([v[0]-v[p] for p in range(1, k)] + [np.ones((k, 1))])
+        b = np.array((k-1)*[0] + [1])
+        solution = np.linalg.solve(A, b)
+        # Create probability vector x
+        solution.resize(m)
+        I = list(I)
+        if len(I) < m:
+          for p in range(m):
+            if p not in I:
+              I += [p]
+        x = np.zeros((m, 1))
+        count = 0
+        for i in I:
+          x[i] = solution[count]
+          count += 1
+        # For player 2
+        A = np.array([u[0]-u[p] for p in range(1, k)] + [np.ones((k, 1))])
+        b = np.array((k-1)*[0] + [1])
+        solution = np.linalg.solve(A, b)
+        # Create probability vector y
+        solution.resize(n)
+        J = list(J)
+        if len(J) < n:
+          for p in range(n):
+            if p not in J:
+              J += [p]
+        y = np.zeros((n, 1))
+        count = 0
+        for j in J:
+          y[j] = solution[count]
+          count += 1
+      # Perform solution checks
+      print(x, y)
   return None
 
 if __name__ == '__main__':
-  ### Test scenario1: Example 2.2 Nisan's et al. book
+  ### Test scenario1: Example 3.3 Nisan et al. book
   # Payoff matrices
-  payoff_matrix_p1 = payoff_matrix_p2 = np.array([[0, 3, 0], [0, 0, 3], [2, 2, 2]])
+  payoff_matrix_p1 = np.array([[3, 3], [2, 5], [0, 6]])
+  payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])  
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
   
