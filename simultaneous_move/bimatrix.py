@@ -72,7 +72,9 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         # For y
         u = [np.dot(y.flatten(), payoff_matrix_p1[i,:]) for i in I_J[0]]
         maximum_y = max([np.dot(y.flatten(), payoff_matrix_p1[m,:]) for m in M])
-        if v.count(maximum_x) == len(v) and u.count(maximum_y) == len(u):
+        # Account for numerical errors from dot product operation on floats
+        if list(map(lambda el: abs(el - maximum_x) <= .0000001, v)).count(True) == len(v) and \
+           list(map(lambda el: abs(el - maximum_y) <= .0000001, u)).count(True) == len(u):
           solutions += [(x, y)]
   return solutions
 
@@ -83,5 +85,17 @@ if __name__ == '__main__':
   payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])  
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  print(msne)
-  
+  print("MSNE for Example 3.3 game:")
+  for ne in msne:
+    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
+  print()
+  ### Test scenario2: Matching Pennies
+  # Payoff matrices
+  payoff_matrix_p1 = np.array([[-1, 1], [1, -1]])
+  payoff_matrix_p2 = np.array([[1, -1], [-1, 1]])
+  # Find MSNE using support enumeration algorithm
+  msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
+  print("MSNE for Matching Pennies game:")
+  for ne in msne:
+    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
+  print()
