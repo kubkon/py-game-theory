@@ -8,6 +8,8 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   m, n = payoff_matrix_p1.shape
   M = set(range(m))
   N = set(range(n))
+  # Output params
+  solutions = []
   # 1. Find set K={1,...,min{m,n}}
   K = set(range(1, min((m, n)) + 1))
   # 2. For each k in K
@@ -23,16 +25,13 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
       J = I_J[1]
       x = np.zeros((m, 1))
       y = np.zeros((n, 1))
-      # For player 1
-      v = [np.array([payoff_matrix_p2[i][j] for i in I]) for j in J]
-      # For player 2
-      u = [np.array([payoff_matrix_p1[i][j] for j in J]) for i in I]
       if k == 1:
         # Create probability vectors x and y
         x[I[0]] = 1
         y[J[0]] = 1
       else:
         # For player 1
+        v = [np.array([payoff_matrix_p2[i, j] for i in I]) for j in J]
         A = np.array([v[0]-v[p] for p in range(1, k)] + [np.ones((k, 1))])
         b = np.array((k-1)*[0] + [1])
         solution = np.linalg.solve(A, b)
@@ -48,6 +47,7 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
           x[i] = solution[count]
           count += 1
         # For player 2
+        u = [np.array([payoff_matrix_p1[i, j] for j in J]) for i in I]
         A = np.array([u[0]-u[p] for p in range(1, k)] + [np.ones((k, 1))])
         b = np.array((k-1)*[0] + [1])
         solution = np.linalg.solve(A, b)
@@ -63,8 +63,18 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
           y[j] = solution[count]
           count += 1
       # Perform solution checks
-      print(x, y)
-  return None
+      # 7. Check if both x and y are nonnegative
+      if (x >= 0).all() and (y >= 0).all():
+        # 8. Check if best response condition is met
+        # For x
+        v = [np.dot(x.flatten(), payoff_matrix_p2[:,j]) for j in I_J[1]]
+        maximum_x = max([np.dot(x.flatten(), payoff_matrix_p2[:,n]) for n in N])
+        # For y
+        u = [np.dot(y.flatten(), payoff_matrix_p1[i,:]) for i in I_J[0]]
+        maximum_y = max([np.dot(y.flatten(), payoff_matrix_p1[m,:]) for m in M])
+        if v.count(maximum_x) == len(v) and u.count(maximum_y) == len(u):
+          solutions += [(x, y)]
+  return solutions
 
 if __name__ == '__main__':
   ### Test scenario1: Example 3.3 Nisan et al. book
@@ -73,4 +83,5 @@ if __name__ == '__main__':
   payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])  
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
+  print(msne)
   
