@@ -1,6 +1,28 @@
 from itertools import combinations
 import numpy as np
 
+def _test(actual, expected, description=None, debug=False):
+  """Compares the numerically derived list of Nash equilibria with the
+  expected (analytical) solution, and prints the result of the comparison
+  to screen.
+  
+  Keyword arguments:
+  actual -- Numerically derived list of Nash equilibria (np.array assumed)
+  expected -- Expected (analytical) solution to the game
+  description -- (Optional) String description of the game
+  debug -- (Optional) True if print derived Nash equilibria to screen
+  """
+  actual = set([(tuple(x.flatten().tolist()),
+                 tuple(y.flatten().tolist())) for (x, y) in actual])
+  result = "Test for game {}".format(description)
+  result += " passed." if actual == set(expected) else " failed."
+  print(result)
+  if debug:
+    print("Derived MSNE for game {}:".format(description))
+    for ne in actual:
+      print("{}, {}".format(ne[0], ne[1]))
+    print()
+
 def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   r"""Implements support enumeration algorithm for computing all Nash
   equilibria of a bimatrix game specified by the input payoff matrices per
@@ -15,10 +37,8 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   IMPORTANT: The algorithm requires the game to be _nondegenerate_.
   
   Keyword arguments:
-  payoff_matrix_p1 -- Payoff matrix of player 1 (np.array functionality
-  required)
-  payoff_matrix_p2 -- Payoff matrix of player 2 (np.array functionality
-  required)
+  payoff_matrix_p1 -- Payoff matrix of player 1 (np.array assumed)
+  payoff_matrix_p2 -- Payoff matrix of player 2 (np.array assumed)
   """
   # Input params
   m, n = payoff_matrix_p1.shape
@@ -104,48 +124,44 @@ if __name__ == '__main__':
   payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  print("MSNE for Equation 3.3 game:")
-  for ne in msne:
-    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
-  print()
+  expected = [((1.0, .0, .0), (1.0, .0)),
+              ((.8, .2, .0), (2/3, 1/3)),
+              ((.0, 1/3, 2/3), (1/3, 2/3))]
+  _test(msne, expected, description="Equation 3.3")
   ### Test scenario2: Matching Pennies
   # Payoff matrices
   payoff_matrix_p1 = np.array([[-1, 1], [1, -1]])
   payoff_matrix_p2 = np.array([[1, -1], [-1, 1]])
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  print("MSNE for Matching Pennies game:")
-  for ne in msne:
-    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
-  print()
+  expected = [((.5, .5), (.5, .5))]
+  _test(msne, expected, description="Matching Pennies")
   ### Test scenario3: Example 2.2 Nisan et al. book
   # Payoff matrices
   payoff_matrix_p1 = np.array([[0, 3, 0], [0, 0, 3], [2, 2, 2]])
   payoff_matrix_p2 = payoff_matrix_p1.transpose()
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  print("MSNE for Example 2.2 game:")
-  for ne in msne:
-    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
-  print()
+  expected = [((.0, 1/3, 2/3), (.0, 1/3, 2/3)),
+              ((.0, 2/3, 1/3), (1/3, .0, 2/3)),
+              ((1/3, .0, 2/3), (.0, 2/3, 1/3))]
+  _test(msne, expected, description="Example 2.2")
   ### Test scenario4: Rock-Paper-Scissors game
   # Payoff matrices
   payoff_matrix_p1 = np.array([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
   payoff_matrix_p2 = np.array([[0, 1, -1], [-1, 0, 1], [1, -1, 0]])
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  print("MSNE for Rock-Paper-Scissors game:")
-  for ne in msne:
-    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
-  print()
+  expected = [((1/3, 1/3, 1/3), (1/3, 1/3, 1/3))]
+  _test(msne, expected, description="Rock-Paper-Scissors")
   ### Test scenario5: Equation 3.7 Nisan et al. book
   # Payoff matrices
   payoff_matrix_p1 = np.array([[3, 3, 0], [4, 0, 1], [0, 4, 5]])
   payoff_matrix_p2 = payoff_matrix_p1.transpose()
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  print("MSNE for Equation 3.7 game:")
-  for ne in msne:
-    print("{}, {}".format(ne[0].flatten(), ne[1].flatten()))
-  print()
+  expected = [((.0, .0, 1.0), (.0, .0, 1.0)),
+              ((.75, .25, .0), (.75, .25, .0)),
+              ((.5, .25, .25), (.5, .25, .25))]
+  _test(msne, expected, description="Equation 3.7")
   
