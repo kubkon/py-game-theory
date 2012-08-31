@@ -117,6 +117,47 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
           msne += [(x, y)]
   return msne
 
+def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
+  # Input params
+  m, n = payoff_matrix_p1.shape
+  # Output params
+  msne = []
+  # Find all vertices of player 1's polytope (denote by P)
+  P = []
+  identity = np.identity(m, dtype=int)
+  zeros_vector = np.zeros((m, 1), dtype=int)
+  ones_vector = np.ones((n, 1), dtype=int)
+  for rows in combinations(range(m + n), m):
+    A = np.array([payoff_matrix_p2.transpose()[i, :] if i < n else identity[i % m, :] for i in rows])
+    b = np.array([ones_vector[i, :] if i < n else zeros_vector[i % m, :] for i in rows])
+    try:
+      x = np.linalg.solve(A, b)
+    except np.linalg.linalg.LinAlgError:
+      continue
+    # Verify that output mixed strategy vector x is a vertex
+    if (np.dot(payoff_matrix_p2.transpose(), x.flatten()) <= 1).all() and \
+       (np.dot(identity, x.flatten()) >= 0).all():
+      P += [x]
+  # Find all vertices of player 2's polytope (denote by Q)
+  Q = []
+  if n != m:
+    identity = np.identity(n, dtype=int)
+    zeros_vector = np.zeros((n, 1), dtype=int)
+    ones_vector = np.ones((m, 1), dtype=int)
+  for rows in combinations(range(n + m), n):
+    A = np.array([payoff_matrix_p1[i, :] if i < m else identity[i % n, :] for i in rows])
+    b = np.array([ones_vector[i, :] if i < m else zeros_vector[i % n, :] for i in rows])
+    try:
+      y = np.linalg.solve(A, b)
+    except np.linalg.linalg.LinAlgError:
+      continue
+    # Verify that output mixed strategy vector y is a vertex
+    if (np.dot(payoff_matrix_p1, y.flatten()) <= 1).all() and \
+       (np.dot(identity, y.flatten()) >= 0).all():
+      Q += [y]
+  # For each (x, y) if the pair is completely labeled, then (x, y) is an NE
+  return msne
+
 if __name__ == '__main__':
   ### Test scenario1: Equation 3.3 Nisan et al. book
   # Payoff matrices
