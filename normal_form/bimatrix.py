@@ -1,15 +1,6 @@
 from itertools import combinations
 import numpy as np
 
-def _round_iterable(iterable, dec_places=5):
-  """Rounds each element of an iterable object, and returns map object.
-  
-  Keyword arguments:
-  iterable -- Iterable object consisting of objects implementing __round__
-  dec_places -- (Optional) Decimal places to round to
-  """
-  return map(lambda el: round(el, dec_places), iterable)
-
 def _test(actual, expected, description=None, debug=False):
   """Compares the numerically derived list of Nash equilibria with the
   expected (analytical) solution, and prints the result of the comparison
@@ -21,6 +12,9 @@ def _test(actual, expected, description=None, debug=False):
   description -- (Optional) String description of the game
   debug -- (Optional) True if print derived Nash equilibria to screen
   """
+  def _round_iterable(iterable, dec_places=5):
+    return map(lambda el: round(el, dec_places), iterable)
+  
   actual = set([(tuple(_round_iterable(x.flatten().tolist())), tuple(_round_iterable(y.flatten().tolist())))
                 for (x, y) in actual])
   expected = set([(tuple(_round_iterable(x)), tuple(_round_iterable(y))) for (x, y) in expected])
@@ -62,8 +56,7 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   for k in K:
     # 3. Let M(k) and N(k) be sets of all k-sized subsets of M and N,
     # respectively. For each pair (I, J) such that I in M(k) and J in N(k),
-    for (I, J) in [(I, J) for I in set(combinations(M, k)) \
-                          for J in set(combinations(N, k))]:
+    for (I, J) in [(I, J) for I in set(combinations(M, k)) for J in set(combinations(N, k))]:
       # 4. Solve for mixed strategy vectors x and y
       x = np.zeros((m, 1))
       y = np.zeros((n, 1))
@@ -112,12 +105,10 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         # 6. Check if best response condition is met
         # For x
         v = [np.dot(x.flatten(), payoff_matrix_p2[:,j]) for j in J]
-        maximum_x = max([np.dot(x.flatten(), \
-                         payoff_matrix_p2[:,n]) for n in N])
+        maximum_x = max([np.dot(x.flatten(), payoff_matrix_p2[:,n]) for n in N])
         # For y
         u = [np.dot(y.flatten(), payoff_matrix_p1[i,:]) for i in I]
-        maximum_y = max([np.dot(y.flatten(), \
-                         payoff_matrix_p1[m,:]) for m in M])
+        maximum_y = max([np.dot(y.flatten(), payoff_matrix_p1[m,:]) for m in M])
         # Account for numerical errors from dot product operation on floats
         if list(map(lambda el: abs(el - maximum_x) <= .0000001,  v)) \
                .count(True) == len(v) and \
@@ -197,7 +188,8 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
        not (y == 0).all():
       Q[rows] = y / np.sum(y)
   # 3. For each (x, y) if the pair is completely labeled, then (x, y) is an NE
-  msne = [(P[x_labels], Q[y_labels]) for y_labels in Q for x_labels in P if len(set(list(x_labels) + list(y_labels))) == (m + n)]
+  msne = [(P[x_labels], Q[y_labels]) for y_labels in Q for x_labels in P
+          if len(set(list(x_labels) + list(y_labels))) == (m + n)]
   return msne
 
 if __name__ == '__main__':
