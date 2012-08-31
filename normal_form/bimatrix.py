@@ -2,6 +2,12 @@ from itertools import combinations
 import numpy as np
 
 def _round_iterable(iterable, dec_places=5):
+  """Rounds each element of an iterable object, and returns map object.
+  
+  Keyword arguments:
+  iterable -- Iterable object consisting of objects implementing __round__
+  dec_places -- (Optional) Decimal places to round to
+  """
   return map(lambda el: round(el, dec_places), iterable)
 
 def _test(actual, expected, description=None, debug=False):
