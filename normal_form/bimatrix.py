@@ -1,6 +1,9 @@
 from itertools import combinations
 import numpy as np
 
+def _round_iterable(iterable, dec_places=5):
+  return map(lambda el: round(el, dec_places), iterable)
+
 def _test(actual, expected, description=None, debug=False):
   """Compares the numerically derived list of Nash equilibria with the
   expected (analytical) solution, and prints the result of the comparison
@@ -12,10 +15,11 @@ def _test(actual, expected, description=None, debug=False):
   description -- (Optional) String description of the game
   debug -- (Optional) True if print derived Nash equilibria to screen
   """
-  actual = set([(tuple(x.flatten().tolist()),
-                 tuple(y.flatten().tolist())) for (x, y) in actual])
+  actual = set([(tuple(_round_iterable(x.flatten().tolist())), tuple(_round_iterable(y.flatten().tolist())))
+                for (x, y) in actual])
+  expected = set([(tuple(_round_iterable(x)), tuple(_round_iterable(y))) for (x, y) in expected])
   result = "Test for game {}".format(description)
-  result += " passed." if actual == set(expected) else " failed."
+  result += " passed." if actual == expected else " failed."
   print(result)
   if debug:
     print("Derived MSNE for game {}:".format(description))
@@ -204,7 +208,7 @@ if __name__ == '__main__':
   _test(msne, expected, description="Equation 3.3/support")
   # Find MSNE using vertex enumeration algorithm
   msne = vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  _test(msne, expected, description="Equation 3.3/vertex", debug=True)
+  _test(msne, expected, description="Equation 3.3/vertex")
   ### Test scenario2: Matching Pennies
   # Payoff matrices
   payoff_matrix_p1 = np.array([[-1, 1], [1, -1]])
@@ -227,7 +231,7 @@ if __name__ == '__main__':
   _test(msne, expected, description="Example 2.2/support")
   # Find MSNE using vertex enumeration algorithm
   msne = vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  _test(msne, expected, description="Example 2.2/vertex", debug=True)
+  _test(msne, expected, description="Example 2.2/vertex")
   ### Test scenario4: Rock-Paper-Scissors game
   # Payoff matrices
   payoff_matrix_p1 = np.array([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
@@ -250,5 +254,5 @@ if __name__ == '__main__':
   _test(msne, expected, description="Equation 3.7/support")
   # Find MSNE using vertex enumeration algorithm
   msne = vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2)
-  _test(msne, expected, description="Equation 3.7/vertex", debug=True)
+  _test(msne, expected, description="Equation 3.7/vertex")
   
