@@ -118,6 +118,24 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   return msne
 
 def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
+  r"""Implements vertex enumeration algorithm for computing all Nash
+  equilibria of a bimatrix game specified by the input payoff matrices per
+  player, and returns a list consisting of all Nash equilibria of the game.
+  Each element of the returned list is a tuple of mixed strategies for both
+  players, with the first element being the mixed strategy of the first
+  player.
+  
+  Full theoretical description of the algorithm can be found in
+  \"Algorithmic Game Theory\" by Nisan et al. (see Algorithm 3.5).
+  
+  IMPORTANT: The algorithm requires the game to be _nondegenerate_, and
+  payoff matrices of both players to be nonnegative and not containing
+  a zero column.
+  
+  Keyword arguments:
+  payoff_matrix_p1 -- Payoff matrix of player 1 (np.array assumed)
+  payoff_matrix_p2 -- Payoff matrix of player 2 (np.array assumed)
+  """
   # Input params
   m, n = payoff_matrix_p1.shape
   # Output params
@@ -126,42 +144,49 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   # Let P be the dictionary of all vertices, where key are the labels
   # corresponding to that particular vertex
   P = {}
-  # 
+  # Create matrices and vectors representing Player 1's polytope boundary constraints
   identity = np.identity(m, dtype=int)
   zeros_vector = np.zeros((m, 1), dtype=int)
   ones_vector = np.ones((n, 1), dtype=int)
-  # 
+  # For all m-combinations of the number of polytope boundary constraints,
   for rows in combinations(range(m + n), m):
     A = np.array([identity[i, :] if i < m else payoff_matrix_p2.transpose()[i % n, :] for i in rows])
     b = np.array([zeros_vector[i, :] if i < m else ones_vector[i % n, :] for i in rows])
+    # Try solving matrix equation Ax = b using LU decomposition method
     try:
       x = np.linalg.solve(A, b)
+    # -- if that fails, then x cannot be a vertex
     except np.linalg.linalg.LinAlgError:
       continue
-    # Verify that output mixed strategy vector x is a vertex
+    # Verify that mixed strategy vector x is a vertex
     if (np.dot(payoff_matrix_p2.transpose(), x.flatten()) <= 1).all() and \
        (np.dot(identity, x.flatten()) >= 0).all() and \
        not (x == 0).all():
       P[rows] = x / np.sum(x)
-  # Find all vertices of player 2's polytope (denote by Q; key=labels)
+  # 2. Find all vertices of player 2's polytope (denote by Q; key=labels)
   Q = {}
+  # Create matrices and vectors representing Player 2's polytope boundary constraints
+  # if the number of pure strategies is different between the players
   if n != m:
     identity = np.identity(n, dtype=int)
     zeros_vector = np.zeros((n, 1), dtype=int)
     ones_vector = np.ones((m, 1), dtype=int)
+  # For all n-combinations of the number of polytope boundary constraints,
   for rows in combinations(range(n + m), n):
     A = np.array([payoff_matrix_p1[i, :] if i < m else identity[i % n, :] for i in rows])
     b = np.array([ones_vector[i, :] if i < m else zeros_vector[i % n, :] for i in rows])
+    # Try solving matrix equation Ay = b using LU decomposition method
     try:
       y = np.linalg.solve(A, b)
+    # -- if that fails, then y cannot be a vertex
     except np.linalg.linalg.LinAlgError:
       continue
-    # Verify that output mixed strategy vector y is a vertex
+    # Verify that mixed strategy vector y is a vertex
     if (np.dot(payoff_matrix_p1, y.flatten()) <= 1).all() and \
        (np.dot(identity, y.flatten()) >= 0).all() and \
        not (y == 0).all():
       Q[rows] = y / np.sum(y)
-  # For each (x, y) if the pair is completely labeled, then (x, y) is an NE
+  # 3. For each (x, y) if the pair is completely labeled, then (x, y) is an NE
   msne = [(P[x_labels], Q[y_labels]) for y_labels in Q for x_labels in P if len(set(list(x_labels) + list(y_labels))) == (m + n)]
   return msne
 
