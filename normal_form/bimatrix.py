@@ -195,8 +195,8 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
 if __name__ == '__main__':
   ### Test scenario1: Equation 3.3 Nisan et al. book
   # Payoff matrices
-  payoff_matrix_p1 = np.array([[3, 3], [2, 5], [0, 6]])
-  payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]])
+  payoff_matrix_p1 = np.array([[3, 3], [2, 5], [0, 6]], dtype=int)
+  payoff_matrix_p2 = np.array([[3, 2], [2, 6], [3, 1]], dtype=int)
   # Expected result
   expected = [((1.0, .0, .0), (1.0, .0)),
               ((.8, .2, .0), (2/3, 1/3)),
@@ -209,8 +209,8 @@ if __name__ == '__main__':
   _test(msne, expected, description="Equation 3.3/vertex")
   ### Test scenario2: Matching Pennies
   # Payoff matrices
-  payoff_matrix_p1 = np.array([[-1, 1], [1, -1]])
-  payoff_matrix_p2 = np.array([[1, -1], [-1, 1]])
+  payoff_matrix_p1 = np.array([[-1, 1], [1, -1]], dtype=int)
+  payoff_matrix_p2 = np.array([[1, -1], [-1, 1]], dtype=int)
   # Expected result
   expected = [((.5, .5), (.5, .5))]
   # Find MSNE using support enumeration algorithm
@@ -218,7 +218,7 @@ if __name__ == '__main__':
   _test(msne, expected, description="Matching Pennies/support")
   ### Test scenario3: Example 2.2 Nisan et al. book
   # Payoff matrices
-  payoff_matrix_p1 = np.array([[0, 3, 0], [0, 0, 3], [2, 2, 2]])
+  payoff_matrix_p1 = np.array([[0, 3, 0], [0, 0, 3], [2, 2, 2]], dtype=int)
   payoff_matrix_p2 = payoff_matrix_p1.transpose()
   # Expected result
   expected = [((.0, 1/3, 2/3), (.0, 1/3, 2/3)),
@@ -232,8 +232,8 @@ if __name__ == '__main__':
   _test(msne, expected, description="Example 2.2/vertex")
   ### Test scenario4: Rock-Paper-Scissors game
   # Payoff matrices
-  payoff_matrix_p1 = np.array([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
-  payoff_matrix_p2 = np.array([[0, 1, -1], [-1, 0, 1], [1, -1, 0]])
+  payoff_matrix_p1 = np.array([[0, -1, 1], [1, 0, -1], [-1, 1, 0]], dtype=int)
+  payoff_matrix_p2 = np.array([[0, 1, -1], [-1, 0, 1], [1, -1, 0]], dtype=int)
   # Expected result
   expected = [((1/3, 1/3, 1/3), (1/3, 1/3, 1/3))]
   # Find MSNE using support enumeration algorithm
@@ -241,7 +241,7 @@ if __name__ == '__main__':
   _test(msne, expected, description="Rock-Paper-Scissors/support")
   ### Test scenario5: Equation 3.7 Nisan et al. book
   # Payoff matrices
-  payoff_matrix_p1 = np.array([[3, 3, 0], [4, 0, 1], [0, 4, 5]])
+  payoff_matrix_p1 = np.array([[3, 3, 0], [4, 0, 1], [0, 4, 5]], dtype=int)
   payoff_matrix_p2 = payoff_matrix_p1.transpose()
   # Expected result
   expected = [((.0, .0, 1.0), (.0, .0, 1.0)),
