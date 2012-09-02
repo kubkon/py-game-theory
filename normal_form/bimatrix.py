@@ -46,17 +46,17 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   """
   # Input params
   m, n = payoff_matrix_p1.shape
-  M = set(range(m))
-  N = set(range(n))
+  M = range(m)
+  N = range(n)
   # Output params
   msne = []
   # 1. Find set K={1,...,min{m,n}}
-  K = set(range(1, min((m, n)) + 1))
+  K = range(1, min((m, n)) + 1)
   # 2. For each k in K,
   for k in K:
     # 3. Let M(k) and N(k) be sets of all k-sized subsets of M and N,
     # respectively. For each pair (I, J) such that I in M(k) and J in N(k),
-    for (I, J) in [(I, J) for I in set(combinations(M, k)) for J in set(combinations(N, k))]:
+    for (I, J) in ((I, J) for I in combinations(M, k) for J in combinations(N, k)):
       # 4. Solve for mixed strategy vectors x and y
       x = np.zeros((m, 1))
       y = np.zeros((n, 1))
@@ -80,7 +80,7 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         indices = list(I)
         if len(indices) < m:
           indices += [p for p in range(m) if p not in indices]
-        for (i,j) in list(map(lambda i,j: (i,j), indices, range(m))):
+        for (i,j) in map(lambda i,j: (i,j), indices, range(m)):
           x[i] = solution[j]
         # For player 2
         u = [np.array([payoff_matrix_p1[i, j] for j in J]) for i in I]
@@ -97,7 +97,7 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         indices = list(J)
         if len(indices) < n:
           indices += [p for p in range(n) if p not in indices]
-        for (i,j) in list(map(lambda i,j: (i,j), indices, range(n))):
+        for (i,j) in map(lambda i,j: (i,j), indices, range(n)):
           y[i] = solution[j]
       # Verify that (x, y) constitutes a Nash equilibrium
       # 5. Check if both x and y are nonnegative
@@ -110,10 +110,8 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
         u = [np.dot(y.flatten(), payoff_matrix_p1[i,:]) for i in I]
         maximum_y = max([np.dot(y.flatten(), payoff_matrix_p1[m,:]) for m in M])
         # Account for numerical errors from dot product operation on floats
-        if list(map(lambda el: abs(el - maximum_x) <= .0000001,  v)) \
-               .count(True) == len(v) and \
-           list(map(lambda el: abs(el - maximum_y) <= .0000001, u)) \
-               .count(True) == len(u):
+        if list(map(lambda el: abs(el - maximum_x) <= .0000001,  v)).count(True) == len(v) and \
+           list(map(lambda el: abs(el - maximum_y) <= .0000001, u)).count(True) == len(u):
           # If the last condition is met, add (x, y) to solution list msne
           msne += [(x, y)]
   return msne
