@@ -101,7 +101,7 @@ def support_enumeration(payoff_matrix_p1, payoff_matrix_p2):
           y[i] = solution[j]
       # Verify that (x, y) constitutes a Nash equilibrium
       # 5. Check if both x and y are nonnegative
-      if (x >= 0).all() and (y >= 0).all():
+      if all(x >= 0) and all(y >= 0):
         # 6. Check if best response condition is met
         # For x
         v = [np.dot(x.flatten(), payoff_matrix_p2[:,j]) for j in J]
@@ -158,9 +158,9 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
     except np.linalg.linalg.LinAlgError:
       continue
     # Verify that mixed strategy vector x is a vertex
-    if (np.dot(payoff_matrix_p2.transpose(), x.flatten()) <= 1).all() and \
-       (np.dot(identity, x.flatten()) >= 0).all() and \
-       not (x == 0).all():
+    if all(np.dot(payoff_matrix_p2.transpose(), x.flatten()) <= 1) and \
+       all(np.dot(identity, x.flatten()) >= 0) and \
+       not all(x == 0):
       P[rows] = x / np.sum(x)
   # 2. Find all vertices of player 2's polytope (denote by Q; key=labels)
   Q = {}
@@ -181,9 +181,9 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
     except np.linalg.linalg.LinAlgError:
       continue
     # Verify that mixed strategy vector y is a vertex
-    if (np.dot(payoff_matrix_p1, y.flatten()) <= 1).all() and \
-       (np.dot(identity, y.flatten()) >= 0).all() and \
-       not (y == 0).all():
+    if all(np.dot(payoff_matrix_p1, y.flatten()) <= 1) and \
+       all(np.dot(identity, y.flatten()) >= 0) and \
+       not all(y == 0):
       Q[rows] = y / np.sum(y)
   # 3. For each (x, y) if the pair is completely labeled, then (x, y) is an NE
   msne = [(P[x_labels], Q[y_labels]) for y_labels in Q for x_labels in P
