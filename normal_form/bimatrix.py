@@ -128,8 +128,7 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   \"Algorithmic Game Theory\" by Nisan et al. (see Algorithm 3.5).
   
   IMPORTANT: The algorithm requires the game to be _nondegenerate_, and
-  payoff matrices of both players to be nonnegative and not containing
-  a zero column.
+  payoff matrices of both players not containing a zero column.
   
   Keyword arguments:
   payoff_matrix_p1 -- Payoff matrix of player 1 (np.array assumed)
@@ -139,7 +138,11 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
   m, n = payoff_matrix_p1.shape
   # Output params
   msne = []
-  # 1. Find all vertices of player 1's polytope
+  # 1. Preprocess by creating a nonnegative payoff matrix for either bidder
+  minimum = min(payoff_matrix_p1.flatten().tolist() + payoff_matrix_p2.flatten().tolist())
+  payoff_matrix_p1 += np.ones((m, n), dtype=int) * abs(minimum)
+  payoff_matrix_p2 += np.ones((m, n), dtype=int) * abs(minimum)
+  # 2. Find all vertices of player 1's polytope
   # Let P be the dictionary of all vertices, where key are the labels
   # corresponding to that particular vertex
   P = {}
@@ -162,7 +165,7 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
        all(np.dot(identity, x.flatten()) >= 0) and \
        not all(x == 0):
       P[rows] = x / np.sum(x)
-  # 2. Find all vertices of player 2's polytope (denote by Q; key=labels)
+  # 3. Find all vertices of player 2's polytope (denote by Q; key=labels)
   Q = {}
   # Create matrices and vectors representing Player 2's polytope boundary constraints
   # if the number of pure strategies is different between the players
@@ -185,7 +188,7 @@ def vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2):
        all(np.dot(identity, y.flatten()) >= 0) and \
        not all(y == 0):
       Q[rows] = y / np.sum(y)
-  # 3. For each (x, y) if the pair is completely labeled, then (x, y) is an NE
+  # 4. For each (x, y) if the pair is completely labeled, then (x, y) is an NE
   msne = [(P[x_labels], Q[y_labels]) for y_labels in Q for x_labels in P
           if len(set(list(x_labels) + list(y_labels))) == (m + n)]
   return msne
@@ -214,6 +217,9 @@ if __name__ == '__main__':
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
   _test(msne, expected, description="Matching Pennies/support")
+  # Find MSNE using vertex enumeration algorithm
+  msne = vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2)
+  _test(msne, expected, description="Matching Pennies/vertex")
   ### Test scenario3: Example 2.2 Nisan et al. book
   # Payoff matrices
   payoff_matrix_p1 = np.array([[0, 3, 0], [0, 0, 3], [2, 2, 2]], dtype=int)
@@ -237,6 +243,9 @@ if __name__ == '__main__':
   # Find MSNE using support enumeration algorithm
   msne = support_enumeration(payoff_matrix_p1, payoff_matrix_p2)
   _test(msne, expected, description="Rock-Paper-Scissors/support")
+  # Find MSNE using vertex enumeration algorithm
+  msne = vertex_enumeration(payoff_matrix_p1, payoff_matrix_p2)
+  _test(msne, expected, description="Rock-Paper-Scissors/vertex")
   ### Test scenario5: Equation 3.7 Nisan et al. book
   # Payoff matrices
   payoff_matrix_p1 = np.array([[3, 3, 0], [4, 0, 1], [0, 4, 5]], dtype=int)
